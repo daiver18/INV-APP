@@ -2,11 +2,11 @@ const admin = require('firebase-admin');
 
 // eslint-disable-next-line consistent-return
 module.exports = function(req, res) {
-    if (!req.body.userName || !req.body.pass) {
+    if (!req.body.userName || !req.body.password) {
         return res.status(422).send({error: 'Bad Input'});
     }
     const userName = String(req.body.userName);
-    const pass = String(req.body.pass);
+    const password = String(req.body.password);
     admin.auth().getUser(userName)
         .then(() => optenerDatos())
         .catch(err => res.status(422).send(err));
@@ -14,7 +14,7 @@ module.exports = function(req, res) {
     function optenerDatos(){
         admin.database().ref('users/' + userName).once('value', snapshot => {
             const user = snapshot.val();
-            if (user.pass !== pass) {
+            if (user.password !== password) {
                 return res.status(422).send({error: 'usuario o contraseña incorrecta'})
             }
             return creadorToken(user)
@@ -25,7 +25,7 @@ module.exports = function(req, res) {
             rol: user.rol_admin
         }
     admin.auth().createCustomToken(userName, additionalClains)
-        .then(customToken => res.send(customToken))
+        .then(customToken => res.send({ token: customToken}))
         .catch(err => res.status(422).send(err));
     }
 }

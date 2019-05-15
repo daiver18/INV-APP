@@ -20,5 +20,4 @@ export const authScreenContainer = {
     justifyContent: 'center',
     alignItems: 'center',
     flex: 1
-
 };

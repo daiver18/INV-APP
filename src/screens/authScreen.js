@@ -1,16 +1,19 @@
 import React, { Component } from 'react';
 import { View } from 'react-native';
-import axios from 'axios';
+import { connect } from 'react-redux';
 import { Input, Image, Button, Text } from 'react-native-elements';
 import { authgContainerStyle, authScreenContainer } from '../css/authScreenCSS';
+import { loginSuccess } from '../actions';
 import logo from '../icons/logo-universidad-de-cordoba.png';
 
-export default class authScreen extends Component {
-  state = { userName: '', pass: '', mensaje: '' }
+class authScreen extends Component {
+  state = { userName: '', password: '', buttonState: false }
 
-  botonLogin = async () => {
-    const { userName, pass } = this.state;
-    await axios.post('https://us-central1-inv-app-cfce0.cloudfunctions.net/login', { userName, pass });
+  botonLogin = () => {
+    const { userName, password } = this.state;
+    this.setState({ buttonState: true });
+    this.props.loginAction(userName, password);
+    this.setState({ buttonState: this.props.buttonState });
   }
   render() {
     return (
@@ -26,7 +29,6 @@ export default class authScreen extends Component {
               placeholder='UserName'
               inputContainerStyle={{ marginLeft: -10, marginBottom: 30 }}
               leftIcon={{ type: 'font-awesome', name: 'user' }}
-              shake
               inputStyle={{ margin: 8 }}
               value={this.state.userName}
               onChangeText={userName => this.setState({ userName })}
@@ -39,15 +41,29 @@ export default class authScreen extends Component {
               leftIcon={{ type: 'font-awesome', name: 'lock' }}
               inputStyle={{ margin: 8 }}
               value={this.state.pass}
-              onChangeText={pass => this.setState({ pass })}
+              onChangeText={password => this.setState({ password })}
             />
             <Button
               title='logIn'
               onPress={this.botonLogin}
+              loading={this.state.buttonState}
             />
-            <Text h4>{this.state.mensaje}</Text>
+            <Text h4>{this.props.error}</Text>
         </View>
       </View>
     );
   }
 }
+function mapStateToProps(state) {
+  const { error, buttonState } = state.auth;
+  return {
+    error,
+    buttonState
+  };
+}
+function mapDispatchToProps(dispatch) {
+  return {
+    loginAction: (userName, password) => dispatch(loginSuccess(userName, password))
+  };
+}
+export default connect(mapStateToProps, mapDispatchToProps)(authScreen);
