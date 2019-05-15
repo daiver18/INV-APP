@@ -14,12 +14,13 @@ module.exports = function(req, res) {
             return addDatos(userName, password, rol_admin)
         })
         .catch(err => res.status(422).send({error: err}));}
-
-    async function addDatos(userName, password, rol_admin) {
-        await admin.database().ref('users/' + userName ).set({
+        
+    function addDatos(userName, password, rol_admin) {
+        admin.database().ref('users/' + userName ).set({
             userName: userName,
             password: password,
             rol_admin
         })
-        res.send('create success')
+        .then(() => res.send('create success'))
+        .catch(() => res.status(422).send({error: 'hubo un error'}));
     }
