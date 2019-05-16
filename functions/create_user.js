@@ -11,16 +11,15 @@ module.exports = function(req, res) {
 
         admin.auth().createUser({ uid: userName })
         .then( () => {
-            return addDatos(userName, password, rol_admin)
+            return addDatos(userName, password, rol_admin, res)
         })
         .catch(err => res.status(422).send({error: err}));}
         
-    function addDatos(userName, password, rol_admin) {
+    function addDatos(userName, password, rol_admin, res) {
         admin.database().ref('users/' + userName ).set({
             userName: userName,
             password: password,
             rol_admin
         })
-        .then(() => res.send('create success'))
-        .catch(() => res.status(422).send({error: 'hubo un error'}));
+        res.send({mensaje: 'created success'})
     }

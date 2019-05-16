@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { View } from 'react-native';
 import { connect } from 'react-redux';
+import axios from 'axios';
+import firebase from 'firebase';
 import { Input, Image, Button, Text } from 'react-native-elements';
 import { authgContainerStyle, authScreenContainer } from '../css/authScreenCSS';
 import { loginSuccess } from '../actions';
@@ -9,11 +11,19 @@ import logo from '../icons/logo-universidad-de-cordoba.png';
 class authScreen extends Component {
   state = { userName: '', password: '', buttonState: false }
 
-  botonLogin = () => {
+  botonLogin = async () => {
     const { userName, password } = this.state;
-    this.setState({ buttonState: true });
-    this.props.loginAction(userName, password);
-    this.setState({ buttonState: this.props.buttonState });
+    try {
+      let { data } = await axios.post('https://us-central1-inv-app-cfce0.cloudfunctions.net/login', { userName, password });
+      await firebase.auth().signInWithCustomToken(data.token);
+      console.log('login success');
+    } catch (error) {
+      console.log(error.code, error.message);
+    }
+    //this.props.loginAction(userName, password);
+  }
+  nextpage = () => {
+    this.props.navigation.navigate('homeScreen');
   }
   render() {
     return (
@@ -50,6 +60,10 @@ class authScreen extends Component {
             />
             <Text h4>{this.props.error}</Text>
         </View>
+        <Button
+              title='next'
+              onPress={this.nextpage}
+        />
       </View>
     );
   }

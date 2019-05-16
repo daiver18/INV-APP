@@ -1,9 +1,13 @@
-import { createAppContainer, createStackNavigator } from 'react-navigation';
+import { createAppContainer, createStackNavigator, createSwitchNavigator } from 'react-navigation';
 import authScreen from './authScreen';
+import homeScreen from './homeScreen';
 
 const AppScreenContainer = createAppContainer(
-    createStackNavigator({
-        authScreen
+    createSwitchNavigator({
+        authScreen,
+        home: createStackNavigator({
+            homeScreen
+        })
     },
     {
         defaultNavigationOptions: {
