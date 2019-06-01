@@ -1,29 +1,21 @@
 import React, { Component } from 'react';
 import { View } from 'react-native';
 import { connect } from 'react-redux';
-import axios from 'axios';
-import firebase from 'firebase';
 import { Input, Image, Button, Text } from 'react-native-elements';
 import { authgContainerStyle, authScreenContainer } from '../css/authScreenCSS';
-import { loginSuccess } from '../actions';
+import { login } from '../actions';
 import logo from '../icons/logo-universidad-de-cordoba.png';
 
 class authScreen extends Component {
-  state = { userName: '', password: '', buttonState: false }
+  state = { userName: '', password: '' }
 
   botonLogin = async () => {
     const { userName, password } = this.state;
-    try {
-      let { data } = await axios.post('https://us-central1-inv-app-cfce0.cloudfunctions.net/login', { userName, password });
-      await firebase.auth().signInWithCustomToken(data.token);
-      console.log('login success');
-    } catch (error) {
-      console.log(error.code, error.message);
-    }
-    //this.props.loginAction(userName, password);
+    const { navigation } = this.props;
+    this.props.loginAction(userName, password, navigation);
   }
   nextpage = () => {
-    this.props.navigation.navigate('homeScreen');
+    this.props.navigation.navigate('newItemScreen');
   }
   render() {
     return (
@@ -56,7 +48,7 @@ class authScreen extends Component {
             <Button
               title='logIn'
               onPress={this.botonLogin}
-              loading={this.state.buttonState}
+              loading={this.props.buttonState}
             />
             <Text h4>{this.props.error}</Text>
         </View>
@@ -77,7 +69,7 @@ function mapStateToProps(state) {
 }
 function mapDispatchToProps(dispatch) {
   return {
-    loginAction: (userName, password) => dispatch(loginSuccess(userName, password))
+    loginAction: (userName, password, navigation) => dispatch(login(userName, password, navigation))
   };
 }
 export default connect(mapStateToProps, mapDispatchToProps)(authScreen);
