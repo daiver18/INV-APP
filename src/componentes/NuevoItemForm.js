@@ -1,13 +1,33 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { View } from 'react-native';
 import { DatePicker } from 'native-base';
-import { Input } from 'react-native-elements';
+import { Input, Button } from 'react-native-elements';
+import { guardarItem } from '../actions';
 
-export default class NuevoItemForm extends Component {
-  state = { fechaEscogida: new Date() }
+class NuevoItemForm extends Component {
+  state = { 
+      itemNombre: '',
+      itemDescripcion: '',
+      fechaEscogida: new Date(),
+      itemSerial: ''
+   }
 
   setDate = (fecha) => {
-    this.setState({ fechaEscogida: fecha });
+    this.setState({ item: { fechaEscogida: fecha } });
+  }
+  
+  itemDatos = () => {
+    console.log('entten en el boton');
+    
+    const { itemNombre, itemDescripcion, itemSerial, fechaEscogida } = this.state;
+    const item = {
+      itemNombre,
+      itemDescripcion, 
+      itemSerial, 
+      fechaEscogida
+    };
+    this.props.saveItemData(item);
   }
   render() {
     return (
@@ -18,6 +38,8 @@ export default class NuevoItemForm extends Component {
             maxLength={10}
             labelStyle={{ color: 'black' }}
             containerStyle={{ marginBottom: 10 }}
+            value={this.state.itemNombre}
+            onChangeText={itemNombre => this.setState({ itemNombre })}
         />
         <Input
             placeholder='cura dolores'
@@ -26,6 +48,8 @@ export default class NuevoItemForm extends Component {
             multiline
             labelStyle={{ color: 'black' }}
             containerStyle={{ marginBottom: 10 }}
+            value={this.state.itemDescripcion}
+            onChangeText={itemDescripcion => this.setState({ itemDescripcion })}
         />
         <DatePicker 
             defaultDate={new Date()}
@@ -49,8 +73,21 @@ export default class NuevoItemForm extends Component {
             label='Serial'
             labelStyle={{ color: 'black' }}
             containerStyle={{ marginBottom: 10 }}
+            value={this.state.itemSerial}
+            onChangeText={itemSerial => this.setState({ itemSerial })}
+        />
+        <Button
+          title='save item'
+          onPress={() => this.itemDatos()}
         />
       </View>
     );
   }
 }
+
+function mapDispatchToProps(dispatch) {
+  return {
+    saveItemData: (item) => dispatch(guardarItem(item))
+  };
+}
+export default connect(null, mapDispatchToProps)(NuevoItemForm);
